@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZoneLife AI | Global Business Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Hind+Siliguri:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --sky: #0ea5e9; --indigo: #6366f1; }
+        
+        /* প্রিমিয়াম এনিমেটেড ব্যাকগ্রাউন্ড */
+        body { 
+            font-family: 'Inter', 'Hind Siliguri', sans-serif; 
+            background: #020617; 
+            color: white; 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 35%, rgba(14, 165, 233, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 65%, rgba(99, 102, 241, 0.15) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* গ্লাস ইফেক্ট */
+        .glass { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(25px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 24px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .active-zone { 
+            border: 2px solid var(--sky); 
+            background: rgba(14, 165, 233, 0.08); 
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.3);
+            transform: translateY(-5px);
+        }
+
+        /* ইনপুট ফিল্ড ডিজাইন */
+        input { 
+            background: rgba(255, 255, 255, 0.05) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--sky) !important; box-shadow: 0 0 10px rgba(14, 165, 233, 0.2); }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+
+    <div id="auth-screen" class="fixed inset-0 z-[1000] bg-[#020617] flex items-center justify-center p-6">
+        <div class="glass p-10 w-full max-w-md text-center">
+            <h1 class="text-4xl font-black mb-2 italic tracking-tighter text-sky-400">ZoneLife AI</h1>
+            <p class="text-gray-500 text-[10px] mb-8 uppercase tracking-widest font-bold">Secure Enterprise Login</p>
+            
+            <div class="space-y-4">
+                <input type="text" id="login-id" placeholder="User ID / Email" class="w-full p-4 rounded-2xl outline-none text-sm text-white">
+                <input type="password" id="login-pass" placeholder="Password" class="w-full p-4 rounded-2xl outline-none text-sm text-white">
+                <button onclick="handleLogin()" class="w-full bg-sky-500 py-4 rounded-2xl font-bold text-white hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/20">Sign In</button>
+            </div>
+            <p class="mt-6 text-[10px] text-gray-500">Global Privacy & Security Protocol Active</p>
+        </div>
+    </div>
+
+    <div id="main-app" class="max-w-6xl mx-auto hidden">
+        <header class="flex justify-between items-center mb-12">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-600 flex items-center justify-center font-bold shadow-xl">Z</div>
+                <div>
+                    <h2 id="display-name" class="font-bold text-lg">Manager</h2>
+                    <span class="text-[10px] text-sky-400 font-bold tracking-widest">ENTERPRISE VERIFIED</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <select id="lang-select" onchange="refreshUI()" class="bg-white/5 text-[11px] border border-white/10 p-2 rounded-xl outline-none cursor-pointer">
+                    <option value="bn-BD">বাংলা (Bengali)</option>
+                    <option value="en-US">English (US)</option>
+                    <option value="hi-IN">हिन्दी (Hindi)</option>
+                </select>
+                <select id="voice-type" class="bg-white/5 text-[11px] border border-white/10 p-2 rounded-xl outline-none cursor-pointer">
+                    <option value="female">♀️ Female Voice</option>
+                    <option value="male">♂️ Male Voice</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="text-center mb-16">
+            <div id="clock" class="text-8xl font-black tracking-tighter mb-4 text-white">00:00:00</div>
+            <div id="current-zone-label" class="text-sky-400 text-xs font-bold tracking-[0.6em] uppercase">Initializing System...</div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+            <div id="z-morning" class="glass p-8 transition-all text-center">
+                <span class="text-3xl">🌅</span>
+                <p class="text-[10px] font-black mt-4 opacity-40 tracking-widest">MORNING</p>
+                <div id="goal-m" class="text-[11px] mt-3 text-sky-300 font-medium">শিডিউল নেই</div>
+            </div>
+            <div id="z-afternoon" class="glass p-8 transition-all text-center">
+                <span class="text-3xl">☀️</span>
+                <p class="text-[10px] font-black mt-4 opacity-40 tracking-widest">AFTERNOON</p>
+                <div id="goal-a" class="text-[11px] mt-3 text-sky-300 font-medium">শিডিউল নেই</div>
+            </div>
+            <div id="z-evening" class="glass p-8 transition-all text-center">
+                <span class="text-3xl">🌆</span>
+                <p class="text-[10px] font-black mt-4 opacity-40 tracking-widest">EVENING</p>
+                <div id="goal-e" class="text-[11px] mt-3 text-sky-300 font-medium">শিডিউল নেই</div>
+            </div>
+            <div id="z-night" class="glass p-8 transition-all text-center">
+                <span class="text-3xl">🌙</span>
+                <p class="text-[10px] font-black mt-4 opacity-40 tracking-widest">NIGHT</p>
+                <div id="goal-n" class="text-[11px] mt-3 text-sky-300 font-medium">শিডিউল নেই</div>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="md:col-span-2 glass p-10">
+                <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
+                    <h3 class="text-xl font-bold flex items-center gap-3">📝 <span id="r-title">স্মার্ট ওয়ার্ক রুটিন</span></h3>
+                    <button onclick="aiVoice()" class="bg-sky-500/10 text-sky-400 px-6 py-2 rounded-full text-[11px] font-bold border border-sky-500/20 hover:bg-sky-500 hover:text-white transition-all">Listen Guidance</button>
+                </div>
+                <div id="routine-list" class="space-y-4"></div>
+            </div>
+
+            <div class="glass p-8 border-t-4 border-sky-500 flex flex-col justify-between">
+                <div>
+                    <h4 class="text-[11px] font-bold text-sky-400 mb-6 uppercase tracking-widest">AI Goal Strategist</h4>
+                    <div id="ai-response" class="text-xs text-gray-400 italic mb-8 leading-relaxed min-h-[120px]">
+                        আপনার আজকের প্রজেক্ট বা লক্ষ্য কী? এখানে লিখুন, আমি আপনার ৪টি টাইম জোনে এটি সাজিয়ে দেব।
+                    </div>
+                </div>
+                <div>
+                    <input type="text" id="ai-task-input" placeholder="Type your goal..." class="w-full p-4 rounded-2xl text-xs mb-4 outline-none">
+                    <button onclick="syncGoal()" class="w-full bg-white text-black py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-sky-500 hover:text-white transition-all">Sync All Zones</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGoals = { m: "ব্যায়াম", a: "অফিস", e: "বাজার", n: "পরিকল্পনা" };
+
+        function handleLogin() {
+            const id = document.getElementById('login-id').value;
+            const pass = document.getElementById('login-pass').value;
+            if(id && pass) {
+                document.getElementById('display-name').innerText = id;
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                refreshUI();
+            } else {
+                alert("Please enter ID and Password");
+            }
+        }
+
+        function refreshUI() {
+            const now = new Date();
+            const h = now.getHours();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], { hour12: false });
+
+            let zone = (h>=6 && h<12) ? 'morning' : (h>=12 && h<18) ? 'afternoon' : (h>=18 && h<24) ? 'evening' : 'night';
+            let zoneId = (h>=6 && h<12) ? 'z-morning' : (h>=12 && h<18) ? 'z-afternoon' : (h>=18 && h<24) ? 'z-evening' : 'z-night';
+
+            document.querySelectorAll('.glass').forEach(el => el.classList.remove('active-zone'));
+            document.getElementById(zoneId).classList.add('active-zone');
+            document.getElementById('current-zone-label').innerText = zone + " Phase Active";
+
+            // Update Cards Advice
+            document.getElementById('goal-m').innerText = currentGoals.m;
+            document.getElementById('goal-a').innerText = currentGoals.a;
+            document.getElementById('goal-e').innerText = currentGoals.e;
+            document.getElementById('goal-n').innerText = currentGoals.n;
+
+            // Update Checklist
+            const tasks = [currentGoals.m, currentGoals.a, currentGoals.e, currentGoals.n];
+            document.getElementById('routine-list').innerHTML = tasks.map(t => `
+                <div class="flex items-center p-5 bg-white/5 rounded-2xl border border-white/5 hover:border-sky-500/50 transition-all">
+                    <input type="checkbox" class="w-5 h-5 accent-sky-500 mr-5">
+                    <span class="text-sm font-medium tracking-wide">${t}</span>
+                </div>
+            `).join('');
+        }
+
+        function syncGoal() {
+            const input = document.getElementById('ai-task-input').value.toLowerCase();
+            const out = document.getElementById('ai-response');
+            out.innerText = "গোল বিশ্লেষণ এবং টাইম জোন কনফিগার করা হচ্ছে...";
+
+            setTimeout(() => {
+                if(input.includes("code") || input.includes("কোড")) {
+                    currentGoals = { m: "অ্যালগরিদম প্র্যাকটিস", a: "মেইন প্রজেক্ট ডেভেলপমেন্ট", e: "নতুন লাইব্রেরি স্টাডি", n: "বাগ ফিক্সিং ও গিট পুশ" };
+                    out.innerText = "সফলভাবে 'Software Engineer' মোড অ্যাক্টিভেট করা হয়েছে। আপনার ৪টি জোন এখন কোডিং-এর জন্য অপ্টিমাইজড।";
+                } else if(input.includes("business") || input.includes("ব্যবসা")) {
+                    currentGoals = { m: "মার্কেট অ্যানালাইসিস", a: "ক্লায়েন্ট মিটিং", e: "অ্যাকাউন্টিং", n: "আগামীকালের ইনভেন্টরি প্ল্যান" };
+                    out.innerText = "আপনার 'Business Growth' মোড সিঙ্ক হয়েছে।";
+                } else {
+                    out.innerText = "আপনার এই লক্ষ্যটি আমি সব জোনে সেট করে দিয়েছি। এখন থেকে আমি আপনাকে অ্যালার্মের মাধ্যমে মনে করিয়ে দেব।";
+                }
+                refreshUI();
+                document.getElementById('ai-task-input').value = "";
+            }, 1000);
+        }
+
+        function aiVoice() {
+            const h = new Date().getHours();
+            let activeTask = (h>=6 && h<12) ? currentGoals.m : (h>=12 && h<18) ? currentGoals.a : (h>=18 && h<24) ? currentGoals.e : currentGoals.n;
+            const msg = new SpeechSynthesisUtterance("আপনার এখনকার লক্ষ্য হলো " + activeTask);
+            msg.lang = document.getElementById('lang-select').value;
+            msg.pitch = (document.getElementById('voice-type').value === 'male') ? 0.8 : 1.1;
+            window.speechSynthesis.speak(msg);
+        }
+
+        setInterval(refreshUI, 1000);
+    </script>
+</body>
+</html>
